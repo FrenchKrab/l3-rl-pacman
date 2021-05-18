@@ -1,0 +1,26 @@
+\chapter{Tests}
+
+Si vous désirez tester directement la qualité des algorithmes implémentés, nous avons laissé à disposition les scripts de test.
+\par
+Ces scripts sont très concis et faciles à comprendre, et n'utilisent que les agents programmés dans le cadre de ce projet, ainsi que NumPy et Gym.
+
+\section{Tests du Deep Q-Learning}
+
+Notez en premier lieu que dans le cas de Ms.Pac-Man, la récompense négative associée à la mort cause la récompense totale finale de chaque épisode d'être 300 points en deçà du score final de l'épisode. Pour obtenir le score réel obtenu par votre agent, il suffit d'ajouter 300 points à la reward finale de l'épisode.
+\par
+Le fichier ``formal\_pacman\_train.py'' permet d'entraîner vous même l'agent DQN (ce qui effacera l'ancienne sauvegarde). Il vous est possible de changer facilement les hyperparamètres de l'agent et les paramètres de son entraînement.
+\par
+``formal\_pacman\_test.py'' permet quant à lui de regarder jouer l'agent DQN préalablement entraîné. Ici aussi, il est aisé de changer les paramètres comme la vitesse de jeu (target\_fps). 
+\par
+Un fichier ``pacman\_formal.dqn'' est livré dans le dossier saves, et sera chargé automatiquement par ce programme. C'est un agent entraîné quelques heures capable de faire des scores corrects. Son Experience Replay a été en revanche totalement vidé car trop lourd (le fichier agent contenant l'experience replay peut peser plusieurs centaines de Mo). 
+\par
+Les (hyper)paramètres utilisés sont ceux fournis dans les explications du chapitre Conception.
+
+\section{Tests du Q-Learning}
+De la même façon que les deux fichiers précédents qui permettent de tester et entraîner un agent DQN, ces fichiers permettent d'entraîner et tester un agent utilisant le Q-Learning sur la recherche de trésor. L'environnement choisi est de taille 10x10 et le terrain est de type ``zigzag''.
+
+
+\section{Utiliser les fichiers dans le logiciel}
+Il est tout à fait possible de charger les fichiers fournis dans le dossier saves à l'aide du logiciel principal. Il est cependant important de bien utiliser les paramètres d'environnement notés plus haut.
+\par
+Le logiciel ne supporte pas la sauvegarde des paramètres de l'environnement avec l'agent, c'est donc à vous de les noter manuellement lors de vos utilisation (il est par exemple possible de les indiquer dans le nom du fichier de sauvegarde).

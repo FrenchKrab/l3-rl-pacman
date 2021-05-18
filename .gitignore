@@ -1,0 +1,12 @@
+# LaTeX
+
+*.aux
+*.fls
+*.fdb_latexmk
+rapport/*.log
+*.synctex.gz
+*.toc
+
+# Python
+
+*.pyc

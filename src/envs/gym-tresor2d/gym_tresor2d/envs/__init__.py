@@ -1,0 +1,1 @@
+from gym_tresor2d.envs.tresor_env import Tresor2dEnv

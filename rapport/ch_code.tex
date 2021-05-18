@@ -1,0 +1,211 @@
+\chapter{Explications du code}
+
+\section{Dépendances et fonctionnements des librairies externes}
+
+\subsection{OpenAI Gym}
+
+OpenAI Gym est une librairie fournissant des dizaines d'environnements destinés à l'apprentissage par renforcement. On y trouve des environnements basé sur la robotique, de simples algorithmes à résoudre, ou encore des jeux Atari 2600. Parmi ces derniers on retrouve Ms. Pac-Man, sur lequel la majorité de notre projet porte.
+
+\subsubsection{Fonctionnement basique}
+Le fonctionnement de Gym est globalement très simple, le plus important est sa classe Env, qui contient 3 fonctions principales :
+\begin{verbatim}
+step(action) -> state, reward, done, info
+render()
+reset() -> reset
+\end{verbatim}
+``step'' permet de faire avancer l'environnement d'une étape en appliquant l'action passée en paramètre, il renvoie l'état résultant, la récompense associée, si l'environnement est dans un état terminal, et des informations supplémentaires spécifiques à chaque jeu.
+\par
+``render'' lancer l'affichage du jeu, soit sous forme textuelle, soit dans une fenêtre séparée selon le jeu. Il est possible de passer en argument un type d'affichage spécifique pour l'enregistrement vidéo par exemple, mais cette fonction ne sera pas utilisée dans le projet.
+\par
+``reset'' remet simplement l'environnement à zéro et renvoie le nouvel état.
+\par
+Pour créer un environnement donné, il suffit d'appeler
+\begin{verbatim}
+import gym
+
+mon_env = gym.make("nom_environnement")
+\end{verbatim}
+Ici on initialise puis stocke l'environnement nommé ``nom\_environnement'' dans la variable ``mon\_env''.
+
+\subsubsection{Création d'environnement personnalisé}
+Afin de rendre les choses plus simples lors de la programmation du logiciel principal, nous avons jugé intéressant de pouvoir directement créer l'environnement de recherche de trésor de façon identique aux reste des environnement.
+\begin{verbatim}
+gym.make("tresor2d-v0")
+\end{verbatim}
+Gym permet d'ajouter ses propres librairies, nous avons ainsi porté l'environnement de recherche de trésor en deux dimensions précédemment créé afin qu'il respecte l'interface de Gym \cite{gym_custom_env}.
+\par
+L'environnement contient ainsi les trois fonctions précédemment citées. Son fonctionnement est simple : il stocke dans un tableau en deux dimensions la topologie du terrain (le type de chaque case : sol, mur, trésor), et dans une variable la position (x,y) du joueur. L'état du jeu correspond à la position du joueur convertie en entier à l'aide de la formule
+\[etat=x + y . width\]
+où $(x,y)$ la position du joueur et $width$ la largeur du terrain.
+\par
+L'installation de l'environnement personnalisé se fait par pip, ce qui limite la portabilité du programme. Nous n'avons cependant pas trouvé d'alternative à cette approche.
+
+
+\subsection{Keras}
+Keras offre différentes fonctionnalités pour permettre une utilisation aisée de l'apprentissage profond.
+
+\subsubsection{Création d'un réseau de neurones basique}
+Nous n'utiliserons dans notre projet que des réseaux de neurones feedforward. Ces derniers se font très simplement à l'aide de Keras, voici un script python utilisant presque toutes les fonctionnalités de Keras que l'on peut retrouver dans notre projet.
+
+\begin{lstlisting}[language=Python,breaklines=true, caption=Exemple d'utilisation de Keras]
+from keras.models import Sequential
+from keras.layers import Dense
+from keras.models import load_model
+
+#Créer un modèle de couches de neurones séquentiel. Les couches se suivent les unes les autres linéairement
+model = Sequential()
+
+#Créer des couches afin d'aboutir à un réseau à 100 entrées,avec deux couches cachées contenant respectivement 8 neurones à activation ReLU et 10 neurones a activation sigmoide, et 2 neurones de sortie à activation linéaire
+model.add(Dense(units=8, activation='relu', input_dim=100))
+model.add(Dense(units=10, activation='sigmoid'))
+model.add(Dense(units=2, activation='linear'))
+
+#Compiler le modèle précedemment défini en utilisant la fonction de perte  Mean Squared Error (Erreur quadratique moyenne) et l'optimizer Adam
+model.compile(loss='mse', optimizer='adam')
+
+#Entraîner le reseaux sur un échantillon de données d'entrée x_batch associées à l'échantillon de sorties attendues y_batch
+model.train_on_batch(x_batch, y_batch)
+
+#Calcule ce que renvoient les noeuds de sortie du réseau
+result = model.predict(x_test)
+
+#Sauvegarde le modèle dans un fichier
+model.save("fichier1.h5")
+
+#Charger un modèle depuis un fichier
+model2 = load_model("fichier2.h5)
+
+\end{lstlisting}
+
+\subsection{NumPy}
+NumPy est une librairie à but ``scientifique'', elle propose des opérations très efficaces sur des tableaux à N dimensions, et possède un grand nombre d'opérations mathématiques de base sur ces derniers.
+\par
+Dans le cadre de notre projet, NumPy est utilisé principalement pour l'implémentation du Q-Learning et plus précisément la manipulation de la Q-Table. Voici pour exemples quelques unes des utilisations majeures de NumPy dans notre projet :
+
+\begin{lstlisting}[language=Python, breaklines=true, caption=Exemples d'utilisations de NumPy]
+import numpy as np
+
+
+#Exemple d'utilisation de NumPy pour créer la Q-Table initialisée par des 0.
+def _build_table(self):
+    return np.zeros([self.state_count, self.action_count])
+
+#Utilisation de NumPy pour récupérer aisément la valeur maximale d'une ligne donnée
+q_target = reward + self.discount_factor * np.max(self.qtable[new_state])
+
+#Récupérer la meilleure action sur un état, c'est-à-dire récupérer l'indice de la case de valeur la plus importante
+best_action = np.argmax(self.qtable[state])
+\end{lstlisting}
+
+
+\section{Structure du projet}
+
+\begin{figure}
+    \centering
+    \begin{forest}
+      for tree={
+        font=\ttfamily,
+        grow'=0,
+        child anchor=west,
+        parent anchor=south,
+        anchor=west,
+        calign=first,
+        edge path={
+          \noexpand\path [draw, \forestoption{edge}]
+          (!u.south west) +(7.5pt,0) |- node[fill,inner sep=1.25pt] {} (.child anchor)\forestoption{edge label};
+        },
+        before typesetting nodes={
+          if n=1
+            {insert before={[,phantom]}}
+            {}
+        },
+        fit=band,
+        before computing xy={l=15pt},
+      }
+    [
+      [agents]
+      [envs
+        [gym-tresor2d
+            [gym\_tresor2d
+                [envs]
+            ]
+        ]
+      ]
+      [misc]
+      [saves]
+    ]
+    \end{forest}
+    \caption{Arborescence du projet}
+\end{figure}{}
+
+
+Le projet n'est pas d'envergure conséquente et il est simple de le diviser en quelques parties distinctes au rôle défini.
+\par
+Notons que quelques classe décrites par la suite contiennent des fonctions privées (précédées d'un \_) qui ne seront pas forcément listée. L'ensemble du code est commenté, nous encourageons donc à aller y jeter un oeil dans le cas où vous souhaiteriez plus de détails sur l'implémentation.
+
+\subsection{Dossier ``agents''}
+Le dossier agents contient les différents agents du projet. Actuellement, le projet supporte deux types d'agents : l'agent utilisant le Q-Learning, et l'agent utilisant le DQN, respectivement \textit{qlearning\_agent.py} et \textit{dqn\_agent.py}.
+\par
+\textit{qlearning\_agent.py} contient une unique classe \textbf{QLearningAgent} disposant de fonctions de base d'un agent : \textit{fit} (entraînement), \textit{act} (agir), \textit{save} (sauvegarder), \textit{load} (charger) ainsi qu'une fonction \textit{get\_written\_summary} permettant d'obtenir un bref résumé écrit de l'état de l'agent. 
+\par
+De même \textit{dqn\_agent.py} contient une unique classe \textbf{DQNAgent} disposant de fonctions des mêmes fonctions de base que QLearningAgent (aux arguments cependant différents selon les fonctions), ainsi que de quelques autres uniques au Deep Q-Learning, comme par exemple \textit{memorize} ou \textit{replay}, liées à l'experience replay.
+\par
+Ces agents fonctionnent indépendamment du reste du projet et peuvent être utilisés facilement. C'est majoritairement eux qui vont faire l'interface avec les librairies citées précédemment.
+
+\subsection{Dossier ``envs''}
+C'est dans ce dossier que se trouve l'environnement de recherche de trésor en deux dimensions. La disposition étrange des dossiers n'est que le résultat des prérequis à son installation par pip, et n'est donc pas un choix délibéré de notre part.
+\par
+Le seul fichier python contenant réellement du code est \textit{tresor\_env.py}, situé quelques sous-dossiers plus bas. Ce dernier contient l'intégralité du code simulant l'environnement.
+\par
+Pour la classe \textbf{Tresor2dEnv}, nous avons dû nous plier à l'interface de classe ``Env'' existant dans la librairie Gym. Afin d'implémenter correctement une classe environnement, il faut hériter de la classe ``Env'' et override les fonctions \textit{step}, \textit{reset} et \textit{render}. Comme expliqué plus tôt dans ce rapport, \textit{step} est chargé de faire avancer le jeu d'une étape en prenant une action en argument, \textit{reset} remet l'environnement à son état initial, et \textit{render} affiche graphiquement l'état du jeu.
+\par
+Pour ce jeu, nous avons simplement stocké l'état du labyrinthe dans un tableau en deux dimension où chaque cellule correspond au terrain de la case, et appliqué un simple test de collision lors des déplacements de la fonction \textit{step}.
+\par
+Concernant la génération du terrain, rien de compliqué n'a été utilisé, trois types de terrains sont possibles : \textit{empty}, \textit{random} et \textit{zigzag}. Le premier est un simple terrain vide avec le trésor à son extremité, le second contient des obstacles aléatoirement placés en créant un chemin permettant d'arriver à coup sûr au trésor, et le dernier génère un labyrinthe où le chemin à emprunter ``zigzague''.
+\par
+Il est possible de choisir le type de génération ainsi que la taille du terrain lors de l'appel de la fonction \textit{make} de Gym. Voici un exemple où l'on crée un environnement de recherche de trésor de taille 6x6 et utilisant la génération ``zigzag''.
+
+\begin{lstlisting}[language=Python,breaklines=true, caption=Initialisation d'un environnement tresor-2d]
+
+import gym
+import gym_tresor2d
+e = gym.make("tresor2d-v0", width=6, height=6, generation_type="zigzag")
+
+\end{lstlisting}
+
+
+\subsection{Dossier ``misc''}
+Le dossier misc (pour ``miscellaneous''), contient différents scripts aux utilités variées. Le projet n'étant pas assez gros pour séparer ces scripts dans plusieurs dossiers sans qu'ils ne se trouvent seuls dans leurs dossiers respectifs, nous avons décidé de rassembler ici tout ce qui ne rentrait pas dans les autres catégories.
+\par
+On y retrouve ``console\_helper.py'', qui permet de rendre générique l'entrée par l'utilisateur d'une suite de valeurs, ce qui est extremement pratique pour le script principal.
+\par
+Le fichier ``gameinfo.py`` permet de récupérer facilement les environnements du projet et les informations qui leur sont associés.
+\par
+Enfin, le fichier ``pacman\_tools.py'' contient les fonction de pré-traitement de l'état du jeu, ainsi que les fonctions permettant de comptabiliser les morts dans la récompense fournie à l'agent.
+
+\subsection{Dossier ``saves''}
+Il n'y a pas grand chose à dire sur ce dossier, ci ce n'est que c'est dans celui-ci que seront sauvegardés les données des agents entraînés.
+
+
+\section{Fonctionnement du projet}
+
+\subsection{Script principal}
+Le script principal du projet est ``launcher\_text.py''. Ce dernier permet un choix du jeu, du type d'agent, de ses hyperparamètres, etc, de façon semblable à ce qui était prévu et décrit dans le cahier des charges. En ce sens, il est inutile de s'attarder dessus puisque à quelques détails esthétiques près, le programme rempli le cahier des charges.
+\par
+Le code du script est assez long mais relativement simple, malgré les nombreuses demandes d'entrées à l'utilisateur. Pour cela, il fait énormément appel à la fonction \textit{enter\_values} du fichier ``console\_helper.py''. Cette dernière prend en entrée un dictionnaire contenant les informations sur les variables que l'utilisateur doit entrer, voici un exemple de tel dictionnaire.
+
+\begin{lstlisting}[language=Python,breaklines=true, caption=Dictionnaire d'entrée de données]
+
+DQN_HYPERPARAMS=[
+    {"name":"learning_rate", "vartype":"real"}, 
+    {"name":"discount_factor", "vartype":"real"},
+    {"name":"memory_size", "vartype":"int", "desc":"Taille de l'experience replay"},
+    {"name":"hidden_layers", "vartype":"layers"},
+    {"name":"activation_function", "vartype":"arrayelement", "array":ACTIVATION_FUNCTIONS, "desc":"Fonction d'activation commune à tous les layers"}
+]
+\end{lstlisting}
+
+Une fois la fonction appelée avec DQN\_HYPERPARAMS en arguments, l'utilisateur devra rentrer successivement le learning rate qui devra être un réel, puis le discount factor, etc.
+\par
+Concernant le reste du script, rien n'est spécialement complexe, il utilise beaucoup le ``duck typing'' du Python ainsi que sa capacité à passer des dictionnaires comme arguments afin de réduire la longueur du code et rendre le tout plus générique.
+

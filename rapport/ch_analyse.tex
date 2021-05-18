@@ -1,0 +1,47 @@
+\chapter{Analyse du projet}
+Du cahier des charges ressort deux objectifs principaux : en utilisant l'apprentissage par renforcement, faire tout d'abord jouer un agent à la recherche de trésor en utilisant le Q-Learning, puis réussir à faire jouer un agent à Pac-Man en utilisant le Deep Q-Learning.
+
+\section{Contraintes}
+
+La première partie du projet, c'est-à-dire la création d'un agent fonctionnant par Q-Learning et dans un environnement de recherche de trésor, ne pose pas de problème ou de contraintes particulière. En effet, l'algorithme de Q-Learning est relativement simple à implémenter et peut se faire dans n'importe quel langage de programmation. De même pour l'environnement de recherche de trésor qui ne consiste qu'au déplacement d'un joueur sur une grille en deux dimensions avec gestion des collisions.
+\par
+C'est la seconde partie qui va contraindre les choix possibles. Deux difficultés s'offrent à nous : la première est l'utilisation de réseaux de neurones, la deuxième est l'utilisation d'un environnement simulant PacMan.
+\par
+Bien qu'il soit tout à fait possible de développer soi-même une librairie simple pour gérer des réseaux de neurones, lors du développement du projet notre expérience dans le domaine était bien trop faible pour partir de zéro et arriver à des résultats concluant. Il était donc nécessaire de trouver un langage accueillant des librairies adaptées à l'apprentissage profond.
+\par
+De même, il est tout à fait possible de développer un jeu Pac-Man dans l'espace de temps donné pour le projet, cependant cette tâche représente un sujet de projet à elle seule, et il nous a paru irréaliste d'espérer pouvoir arriver à tenir cet objectif. Le langage choisi devra en conséquence posséder une librairie permettant de lier la librairie gérant les réseaux de neurones à un émulateur ou un jeu semblable à Pac-Man.
+\par
+Enfin, notons que le sujet mentionne que le programme final devra pouvoir être utilisé sous un environnement Linux.
+
+
+\section{Analyse et choix de solutions}
+\subsection{Choix du langage}
+Le choix du langage importe relativement peu vis-à-vis de la contrainte majeure qu'est l'existence d'une librairie de machine learning. En effet, l'essor incroyable de ce domaine ces dernières années a pour conséquence la présence d'au moins une librairie de machine learning dans la plupart des langages. De plus dans notre cas la librairie choisie n'a pas besoin d'être à l'état de l'art, des fonctionnalités de bases suffisent amplement à accomplir nos objectifs. Nous avons donc restreint notre choix au langages que nous connaissions : Java, Python et C.
+\par
+Ce dernier est toutefois un langage très rigide où les tests rapides et les itérations de développements ne sont pas aisés.
+Et bien qu'il soit très performant, c'est majoritairement la librairie de machine learning qui définira la performance du programme. Nous avons donc décidé de privilégier le Java ou le Python, tous deux bien plus souples et simples à utiliser.
+\par
+Le Java et le Python sont utilisés en machine learning, mais depuis quelques années c'est surtout Python qui s'est imposé comme un des langage de prédilection du machine learning avec le langage R. De nombreuses librairies de très bonne qualité possèdent des bindings en Python, et un grand nombre de ressources sont disponibles en ligne (tutoriels, exemples). Le Python est aussi un langage à la syntaxe très simple et souple (non typé, utilisant le duck-typing), au prix d'une performance plus faible (toutefois en partie comblée par les librairies de machine learning, souvent programmées en C ou C++).
+\par
+
+
+
+\subsection{Environnement Pac-Man}
+Un des facteurs majeurs nous ayant fait basculer définitivement vers le choix du Python est la librairie \textbf{OpenAI Gym} qui fournit un grand nombre d'environnements de qualité pour l'apprentissage par renforcement, à l'interface de programmation simple. Parmi ces environnements se trouvent entre autres un large panel de jeux Atari 2600 dont ``Ms. Pac-Man'', une suite de Pac-Man aux mécaniques identiques. Cette librairie est par ailleurs facilement installable sous un environnement Linux.
+\par
+Nos recherches ne nous ont pas permis de trouver d'autre outil si complet et simple d'utilisation répondant à ce besoin.
+
+\subsection{Environnement de ``Recherche de trésor''}
+L'environnement ``Recherche de trésor'' est basé sur un principe assez simple et ne présente aucune difficulté particulière, si ce n'est de rendre son interface de programmation simple à combiner avec les librairies de machine learning. Nous nous chargerons de le programmer nous-même.
+
+
+\subsection{Librairie de Q-Learning}
+L'implémentation du Q-Learning est aisément réalisable sans librairie particulière, très peu d'opérations complexes y sont effectuées. Toutefois nous utiliseront NumPy, une librairie très largement utilisée et incluse de base dans toute distribution de Python. Elle permet notamment parmi une myriade de fonctionnalités mathématiques une manipulation aisée de matrices et de tableaux.
+
+\subsection{Librairie de machine learning}
+Reste à choisir la librairie de machine learning parmi le très large éventail disponible. Parmi les plus utilisées on trouve actuellement Tensorflow, PyTorch, Theano ou encore Scikit-learn. Pour effectuer notre choix, nous avons simplement cherché différents exemples d'implémentation d'agent DQN. Nous avons observé que la librairie la plus utilisée dans les tutoriels de machine learning de façon générale est Keras. Keras est une librairie de machine learning de haut niveau open source permettant une interaction simple avec des librairies plus bas niveau telles que Tensorflow ou Theano.
+
+\subsection{Interface graphique}
+Bien que cela ne figure pas dans le cahier des charges, qui mentionne la console pour seule interface homme-machine, il n'est pas exclu d'ajouter une interface graphique une fois le projet terminé.
+\par
+Nous nous sommes accordé à utiliser Tkinter dans le cas où nous pouvions développer cette interface. Nous avons déjà utilisé cette librairie par le passé, qui possède toutes les fonctionnalités nécessaires à la création d'une interface, et sur laquelle il sera possible d'appliquer les concepts de Programmation Orientée Objet vus durant le cinquième semestre de licence, avec par exemple l'architecture MVC.
